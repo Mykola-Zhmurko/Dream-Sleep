@@ -48,8 +48,7 @@ export function RecordingsProvider({ children }: { children: React.ReactNode }) 
     load();
   }, [load]);
 
-  const save = useCallback(async (list: RecordingSegment[]) => {
-    setRecordings(list);
+  const persist = useCallback(async (list: RecordingSegment[]) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }, []);
 
@@ -57,29 +56,44 @@ export function RecordingsProvider({ children }: { children: React.ReactNode }) 
     async (segment: Omit<RecordingSegment, 'id'>) => {
       const id = `rec_${Date.now()}_${Math.random().toString(36).slice(2)}`;
       const newSegment: RecordingSegment = { ...segment, id };
-      const next = [newSegment, ...recordings].sort((a, b) => b.timestamp - a.timestamp);
-      await save(next);
+      setRecordings((prev) => {
+        const next = [newSegment, ...prev].sort((a, b) => b.timestamp - a.timestamp);
+        persist(next);
+        return next;
+      });
     },
-    [recordings, save],
+    [persist],
   );
 
   const deleteRecording = useCallback(
     async (id: string) => {
-      const target = recordings.find((r) => r.id === id);
-      if (target) {
+      // Read current recordings for file deletion
+      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      if (raw) {
         try {
-          const info = await FileSystem.getInfoAsync(target.uri);
-          if (info.exists) {
-            await FileSystem.deleteAsync(target.uri, { idempotent: true });
+          const all: RecordingSegment[] = JSON.parse(raw);
+          const target = all.find((r) => r.id === id);
+          if (target) {
+            try {
+              const info = await FileSystem.getInfoAsync(target.uri);
+              if (info.exists) {
+                await FileSystem.deleteAsync(target.uri, { idempotent: true });
+              }
+            } catch {
+              // ignore file deletion errors
+            }
           }
         } catch {
-          // ignore file deletion errors
+          // ignore
         }
       }
-      const next = recordings.filter((r) => r.id !== id);
-      await save(next);
+      setRecordings((prev) => {
+        const next = prev.filter((r) => r.id !== id);
+        persist(next);
+        return next;
+      });
     },
-    [recordings, save],
+    [persist],
   );
 
   return (

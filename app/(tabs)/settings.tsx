@@ -58,7 +58,7 @@ export default function SettingsScreen() {
   const handleSaveAlarm = useCallback(() => {
     const match = alarmInput.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
     if (!match) {
-      Alert.alert('Invalid Time', 'Please enter time in HH:MM format (e.g. 07:30)');
+      Alert.alert(t('settings_invalid_time'), t('settings_invalid_time_msg'));
       return;
     }
     setAlarmTime(alarmInput);
@@ -207,7 +207,7 @@ export default function SettingsScreen() {
               {t('settings_alarm_time')}
             </Text>
             <Text style={[styles.modalHint, { color: colors.muted }]}>
-              Enter time in 24-hour format (HH:MM)
+              {t('settings_alarm_hint')}
             </Text>
             <TextInput
               value={alarmInput}

@@ -31,9 +31,10 @@ export function WaveformView({
       // Generate a default waveform shape if no data
       return Array.from({ length: barCount }, (_, i) => {
         const x = i / barCount;
-        // Bell-curve-like shape
+        // Bell-curve-like shape with deterministic variation
         const amp = 0.15 + 0.5 * Math.exp(-Math.pow((x - 0.5) * 4, 2));
-        return amp + (Math.random() * 0.1 - 0.05);
+        const pseudoRandom = Math.sin(i * 127.1 + 311.7) * 0.5 + 0.5; // 0-1 deterministic
+        return amp + (pseudoRandom * 0.1 - 0.05);
       });
     }
 

@@ -1,0 +1,16 @@
+node_modules
+.expo
+dist
+*.tsbuildinfo
+.env
+.env.*
+ios
+android
+__tests__
+*.test.ts
+*.test.tsx
+.git
+.github
+.vscode
+.idea
+*.log

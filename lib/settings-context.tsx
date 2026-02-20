@@ -51,27 +51,30 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const save = useCallback((next: AppSettings) => {
-    setSettings(next);
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  const save = useCallback((updater: (prev: AppSettings) => AppSettings) => {
+    setSettings((prev: AppSettings) => {
+      const next = updater(prev);
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
   }, []);
 
   const setThemeMode = useCallback(
-    (mode: ThemeMode) => save({ ...settings, themeMode: mode }),
-    [settings, save],
+    (mode: ThemeMode) => save((prev) => ({ ...prev, themeMode: mode })),
+    [save],
   );
 
   const setLanguage = useCallback(
     (lang: Language) => {
       i18n.changeLanguage(lang);
-      save({ ...settings, language: lang });
+      save((prev) => ({ ...prev, language: lang }));
     },
-    [settings, save],
+    [save],
   );
 
   const setAlarmTime = useCallback(
-    (time: string | null) => save({ ...settings, alarmTime: time }),
-    [settings, save],
+    (time: string | null) => save((prev) => ({ ...prev, alarmTime: time })),
+    [save],
   );
 
   return (

@@ -26,6 +26,12 @@ const resources = {
       home_recording_auto_stop: 'Auto-stop at {{time}}',
       home_alarm_set_manually: 'Alarm set manually',
       home_tap_to_set_alarm: 'Tap to set alarm time',
+      home_dream_recording: 'Dream Recording',
+      home_segments: 'segments',
+      home_segments_saved: '{{count}} dream segments saved',
+      home_hint_waiting: 'Microphone will activate after the countdown',
+      home_hint_recording: 'Recording speech above 40dB automatically',
+      home_hint_idle: 'Tap to begin — microphone activates after 30 min',
 
       // Recordings Screen
       recordings_title: 'Dream Recordings',
@@ -74,6 +80,12 @@ const resources = {
       settings_about: 'About',
       settings_version: 'Version {{version}}',
       settings_privacy: 'All data stays on your device. Nothing is uploaded.',
+      settings_invalid_time: 'Invalid Time',
+      settings_invalid_time_msg: 'Please enter time in HH:MM format (e.g. 07:30)',
+      settings_alarm_hint: 'Enter time in 24-hour format (HH:MM)',
+      recordings_delete_title: 'Delete Recording',
+      recordings_delete_msg: 'This recording will be permanently deleted.',
+      recordings_playback_error: 'Could not play recording',
 
       // Common
       common_cancel: 'Cancel',
@@ -108,6 +120,12 @@ const resources = {
       home_recording_auto_stop: 'Automatischer Stopp um {{time}}',
       home_alarm_set_manually: 'Alarm manuell gesetzt',
       home_tap_to_set_alarm: 'Tippen zum Alarm setzen',
+      home_dream_recording: 'Traumaufnahme',
+      home_segments: 'Segmente',
+      home_segments_saved: '{{count}} Traumsegmente gespeichert',
+      home_hint_waiting: 'Mikrofon aktiviert sich nach dem Countdown',
+      home_hint_recording: 'Sprache über 40dB wird automatisch aufgenommen',
+      home_hint_idle: 'Tippen zum Starten — Mikrofon aktiviert sich nach 30 Min',
 
       // Recordings Screen
       recordings_title: 'Traumaufnahmen',
@@ -156,6 +174,12 @@ const resources = {
       settings_about: 'Über die App',
       settings_version: 'Version {{version}}',
       settings_privacy: 'Alle Daten bleiben auf deinem Gerät. Es wird nichts hochgeladen.',
+      settings_invalid_time: 'Ungültige Zeit',
+      settings_invalid_time_msg: 'Bitte Zeit im HH:MM-Format eingeben (z.B. 07:30)',
+      settings_alarm_hint: 'Zeit im 24-Stunden-Format eingeben (HH:MM)',
+      recordings_delete_title: 'Aufnahme löschen',
+      recordings_delete_msg: 'Diese Aufnahme wird dauerhaft gelöscht.',
+      recordings_playback_error: 'Aufnahme konnte nicht abgespielt werden',
 
       // Common
       common_cancel: 'Abbrechen',
@@ -190,6 +214,12 @@ const resources = {
       home_recording_auto_stop: 'Автозупинка о {{time}}',
       home_alarm_set_manually: 'Будильник встановлено вручну',
       home_tap_to_set_alarm: 'Натисніть, щоб встановити час',
+      home_dream_recording: 'Запис снів',
+      home_segments: 'сегментів',
+      home_segments_saved: '{{count}} сегментів снів збережено',
+      home_hint_waiting: 'Мікрофон активується після зворотного відліку',
+      home_hint_recording: 'Мовлення вище 40дБ записується автоматично',
+      home_hint_idle: 'Натисніть — мікрофон активується через 30 хв',
 
       // Recordings Screen
       recordings_title: 'Записи снів',
@@ -238,6 +268,12 @@ const resources = {
       settings_about: 'Про застосунок',
       settings_version: 'Версія {{version}}',
       settings_privacy: 'Усі дані зберігаються на вашому пристрої. Нічого не завантажується.',
+      settings_invalid_time: 'Невірний час',
+      settings_invalid_time_msg: 'Введіть час у форматі ГГ:ХХ (напр. 07:30)',
+      settings_alarm_hint: 'Введіть час у 24-годинному форматі (ГГ:ХХ)',
+      recordings_delete_title: 'Видалити запис',
+      recordings_delete_msg: 'Цей запис буде остаточно видалено.',
+      recordings_playback_error: 'Не вдалося відтворити запис',
 
       // Common
       common_cancel: 'Скасувати',

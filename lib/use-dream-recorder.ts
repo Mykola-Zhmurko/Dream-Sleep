@@ -66,6 +66,8 @@ export function useDreamRecorder(): DreamRecorderHook {
   const amplitudeDataRef = useRef<number[]>([]);
   const savedSegmentsRef = useRef<SavedSegment[]>([]);
   const stateRef = useRef<DreamRecorderState>('idle');
+  const autoStopTimeRef = useRef<number | null>(null);
+  const stopDreamRecordingRef = useRef<() => Promise<SavedSegment[]>>(async () => []);
 
   const updateState = useCallback((s: DreamRecorderState) => {
     stateRef.current = s;
@@ -160,15 +162,15 @@ export function useDreamRecorder(): DreamRecorderHook {
     meterIntervalRef.current = setInterval(async () => {
       if (!isListeningRef.current) return;
 
-      // Check auto-stop
-      if (autoStopTime && Date.now() >= autoStopTime) {
-        stopDreamRecording();
+      // Check auto-stop (read from ref to avoid stale closure)
+      const currentAutoStop = autoStopTimeRef.current;
+      if (currentAutoStop && Date.now() >= currentAutoStop) {
+        stopDreamRecordingRef.current();
         return;
       }
 
-      // Get current metering level
-      const currentState = recorderState;
-      const meteringDb = currentState.metering ?? -160;
+      // Get current metering level directly from recorder (avoids stale recorderState)
+      const meteringDb = audioRecorder.currentMetering ?? -160;
 
       // Normalize to 0-1 for waveform
       const normalized = Math.max(0, Math.min(1, (meteringDb + 160) / 160));
@@ -199,7 +201,7 @@ export function useDreamRecorder(): DreamRecorderHook {
         }
       }
     }, METER_INTERVAL_MS);
-  }, [autoStopTime, recorderState, startSegment, stopCurrentSegment, updateState]);
+  }, [audioRecorder, startSegment, stopCurrentSegment, updateState]);
 
   const startDreamRecording = useCallback(
     async (autoStop?: number) => {
@@ -211,7 +213,9 @@ export function useDreamRecorder(): DreamRecorderHook {
       savedSegmentsRef.current = [];
       setSavedSegments([]);
       setSegmentCount(0);
-      setAutoStopTime(autoStop ?? null);
+      const stopTime = autoStop ?? null;
+      setAutoStopTime(stopTime);
+      autoStopTimeRef.current = stopTime;
       updateState('waiting');
 
       const waitSeconds = WAIT_BEFORE_LISTEN_MS / 1000;
@@ -268,6 +272,11 @@ export function useDreamRecorder(): DreamRecorderHook {
 
     return savedSegmentsRef.current;
   }, [stopCurrentSegment, updateState]);
+
+  // Keep stopDreamRecordingRef in sync
+  useEffect(() => {
+    stopDreamRecordingRef.current = stopDreamRecording;
+  }, [stopDreamRecording]);
 
   // Cleanup on unmount
   useEffect(() => {

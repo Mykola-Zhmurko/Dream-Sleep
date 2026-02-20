@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -30,6 +30,20 @@ export default function RecordingsScreen() {
   const { recordings, deleteRecording } = useRecordings();
   const [playbackStates, setPlaybackStates] = useState<Record<string, PlaybackState>>({});
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const playersRef = useRef<Map<string, any>>(new Map());
+  const intervalsRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
+
+  // Cleanup all players on unmount
+  useEffect(() => {
+    return () => {
+      playersRef.current.forEach((player) => {
+        try { player.remove(); } catch { /* ignore */ }
+      });
+      intervalsRef.current.forEach((interval) => clearInterval(interval));
+      playersRef.current.clear();
+      intervalsRef.current.clear();
+    };
+  }, []);
 
   // Group recordings by date
   const sections = useMemo(() => {
@@ -50,7 +64,7 @@ export default function RecordingsScreen() {
     (id: string) => {
       Alert.alert(
         t('recordings_delete'),
-        'Are you sure you want to delete this recording?',
+        t('recordings_delete_confirm'),
         [
           { text: t('common_cancel'), style: 'cancel' },
           {
@@ -69,7 +83,16 @@ export default function RecordingsScreen() {
       const current = playbackStates[recording.id];
 
       if (current?.isPlaying) {
-        // Pause — we don't have a persistent player reference here, so just update state
+        // Pause: stop the actual player and clear interval
+        const player = playersRef.current.get(recording.id);
+        if (player) {
+          try { player.pause(); } catch { /* ignore */ }
+        }
+        const interval = intervalsRef.current.get(recording.id);
+        if (interval) {
+          clearInterval(interval);
+          intervalsRef.current.delete(recording.id);
+        }
         setPlaybackStates((prev) => ({
           ...prev,
           [recording.id]: { ...prev[recording.id], isPlaying: false },
@@ -77,9 +100,17 @@ export default function RecordingsScreen() {
         return;
       }
 
+      // Clean up any existing player for this recording
+      const existingPlayer = playersRef.current.get(recording.id);
+      if (existingPlayer) {
+        try { existingPlayer.remove(); } catch { /* ignore */ }
+        playersRef.current.delete(recording.id);
+      }
+
       setLoadingId(recording.id);
       try {
         const player = createAudioPlayer({ uri: recording.uri });
+        playersRef.current.set(recording.id, player);
         setPlaybackStates((prev) => ({
           ...prev,
           [recording.id]: { id: recording.id, isPlaying: true, progress: 0 },
@@ -100,19 +131,22 @@ export default function RecordingsScreen() {
           }));
           if (progress >= 1) {
             clearInterval(progressInterval);
+            intervalsRef.current.delete(recording.id);
             setPlaybackStates((prev) => ({
               ...prev,
               [recording.id]: { ...prev[recording.id], isPlaying: false, progress: 0 },
             }));
             player.remove();
+            playersRef.current.delete(recording.id);
           }
         }, 200);
+        intervalsRef.current.set(recording.id, progressInterval);
       } catch {
         setLoadingId(null);
-        Alert.alert('Playback Error', 'Could not play this recording.');
+        Alert.alert(t('recordings_playback_error'), t('recordings_playback_error_msg'));
       }
     },
-    [playbackStates],
+    [playbackStates, t],
   );
 
   const formatDuration = (seconds: number) => {

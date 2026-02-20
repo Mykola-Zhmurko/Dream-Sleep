@@ -29,9 +29,10 @@ export function useSunrise(alarmTime: string | null) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const originalBrightnessRef = useRef<number | null>(null);
   const isActiveRef = useRef(false);
+  const [keepAwake, setKeepAwake] = useState(false);
 
-  // Keep screen awake during active sunrise
-  useKeepAwake(isActiveRef.current ? 'sunrise' : undefined);
+  // Keep screen awake during active sunrise (state-driven, not ref-driven)
+  useKeepAwake(keepAwake ? 'sunrise' : undefined);
 
   const stopSunrise = useCallback(async () => {
     if (intervalRef.current) {
@@ -39,6 +40,7 @@ export function useSunrise(alarmTime: string | null) {
       intervalRef.current = null;
     }
     isActiveRef.current = false;
+    setKeepAwake(false);
     // Restore original brightness
     if (Platform.OS !== 'web' && originalBrightnessRef.current !== null) {
       try {
@@ -73,6 +75,7 @@ export function useSunrise(alarmTime: string | null) {
 
         if (!isActiveRef.current) {
           isActiveRef.current = true;
+          setKeepAwake(true);
           // Save original brightness
           if (Platform.OS !== 'web') {
             try {
@@ -109,6 +112,7 @@ export function useSunrise(alarmTime: string | null) {
           }
         }
         isActiveRef.current = false;
+        setKeepAwake(false);
         setStatus({ state: 'done', progress: 1, minutesUntilStart: null, startTime, endTime });
         if (intervalRef.current) {
           clearInterval(intervalRef.current);

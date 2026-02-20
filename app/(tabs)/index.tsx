@@ -223,7 +223,7 @@ export default function HomeScreen() {
         {/* Dream Recording Section */}
         <View style={styles.recordingSection}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            Dream Recording
+            {t('home_dream_recording')}
           </Text>
 
           {/* Recording status */}
@@ -231,7 +231,7 @@ export default function HomeScreen() {
             <View style={[styles.statusBadge, { backgroundColor: colors.recording + '20' }]}>
               <View style={[styles.statusDot, { backgroundColor: colors.recording }]} />
               <Text style={[styles.statusText, { color: colors.recording }]}>
-                {t('home_recording_active')} · {recorderStatus.segmentCount} segments
+                {t('home_recording_active')} · {recorderStatus.segmentCount} {t('home_segments')}
               </Text>
             </View>
           )}
@@ -248,7 +248,7 @@ export default function HomeScreen() {
             <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
               <IconSymbol name="checkmark.circle.fill" size={14} color={colors.success} />
               <Text style={[styles.statusText, { color: colors.success }]}>
-                {recorderStatus.segmentCount} dream segments saved
+                {t('home_segments_saved', { count: recorderStatus.segmentCount })}
               </Text>
             </View>
           )}
@@ -290,10 +290,10 @@ export default function HomeScreen() {
 
           <Text style={[styles.recordHint, { color: colors.muted }]}>
             {isWaiting
-              ? 'Microphone will activate after the countdown'
+              ? t('home_hint_waiting')
               : isRecordingActive
-              ? 'Recording speech above 40dB automatically'
-              : 'Tap to begin — microphone activates after 30 min'}
+              ? t('home_hint_recording')
+              : t('home_hint_idle')}
           </Text>
         </View>
       </ScrollView>
